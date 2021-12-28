@@ -99,9 +99,11 @@ int battery_percent(void)
 	/* try capacity node first but keep in mind it's not supported by all power class devices */
 	if ((capacity = nyx_utils_read_value(batt_capacity_path)) < 0)
 	{
+        nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie battery.c we have capacity path");
 		/* capacity node is not available so next try is energy_full path */
 		if (g_file_test(batt_energy_full_path, G_FILE_TEST_EXISTS))
 		{
+            nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie battery.c we have full capacity path");
 			if ((now = nyx_utils_read_value(batt_energy_now_path)) < 0)
 			{
 				return -1;
@@ -111,12 +113,16 @@ int battery_percent(void)
 			{
 				return -1;
 			}
+            nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie battery.c we have capacity now = %d ", now);
+            nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie battery.c we have capacity full = %d ", full);
 
 			capacity = (100 * now / full);
+            //nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie battery.c we have capacity = %d ", capacity);
 		}
 		/* as last try we can use charge_now path */
 		else if (g_file_test(batt_charge_now_path, G_FILE_TEST_EXISTS))
 		{
+            nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie battery.c we have charge_now path");
 			if ((full = nyx_utils_read_value(batt_charge_full_path)) < 0)
 			{
 				return -1;
@@ -127,7 +133,11 @@ int battery_percent(void)
 				return -1;
 			}
 
+            //nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie battery.c we have capacity now = %d ", now);
+            //nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie battery.c we have capacity full = %d ", full);
+
 			capacity = (100 * now / full);
+            //nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie battery.c we have capacity = %d ", capacity);
 		}
 		else
 		{
@@ -319,8 +329,11 @@ static void detect_battery_sysfs_paths()
 {
 	battery_sysfs_path = find_power_supply_sysfs_path("Battery");
 
+	nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie battery.c battery_sysfs_path = %s", battery_sysfs_path);
+
 	if (battery_sysfs_path)
 	{
+        nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie battery.c inside battery_sysfs_path");
 		snprintf(batt_capacity_path, PATH_LEN, "%s/capacity", battery_sysfs_path);
 		snprintf(batt_energy_now_path, PATH_LEN, "%s/energy_now", battery_sysfs_path);
 		snprintf(batt_energy_full_path, PATH_LEN, "%s/energy_full", battery_sysfs_path);
@@ -334,6 +347,17 @@ static void detect_battery_sysfs_paths()
 		snprintf(batt_present_path, PATH_LEN, "%s/present", battery_sysfs_path);
 		snprintf(batt_fake_battery_path, PATH_LEN, "%s/pseudo_batt",
 		         battery_sysfs_path);
+        nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie battery.c batt_capacity_path = %s", batt_capacity_path);
+        nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie battery.c batt_energy_now_path = %s", batt_energy_now_path);
+        nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie battery.c batt_energy_full_path = %s", batt_energy_full_path);
+        nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie battery.c batt_charge_now_path = %s", batt_charge_now_path);
+        nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie battery.c batt_charge_full_path = %s", batt_charge_full_path);
+        nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie battery.c batt_charge_full_design_path = %s", batt_charge_full_design_path);
+        nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie battery.c batt_temperature_path = %s", batt_temperature_path);
+        nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie battery.c batt_voltage_path = %s", batt_voltage_path);
+        nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie battery.c batt_current_path = %s", batt_current_path);
+        nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie battery.c batt_present_path = %s", batt_present_path);
+        nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie battery.c batt_fake_battery_path = %s", batt_fake_battery_path);        
 	}
 }
 
@@ -381,7 +405,9 @@ nyx_error_t battery_init(void)
 
 	// initialize current battery present/percentage values
 	current_battery_present = battery_is_present();
+    nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie battery.c current_battery_present = %d", current_battery_present);        
 	current_battery_percentage = current_battery_present ? battery_percent() : 0;
+    nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie battery.c current_battery_percentage = %d", current_battery_percentage);        
 
 	mon = udev_monitor_new_from_netlink(udev, "kernel");
 

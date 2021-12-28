@@ -71,17 +71,25 @@ nyx_error_t core_charger_read_status(nyx_charger_status_t *status)
 {
 	/* before we start to update the charger status we reset it completely */
 	memset(&gChargerStatus, 0, sizeof(nyx_charger_status_t));
+    //nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie charger.c core_charger_read_status status = %s", status);
 
 	/* function returns -1 on invalid file path, so check for 1, instead of true */
 	if (nyx_utils_read_value(charger_usb_sysfs_online_path) == 1)
 	{
+        nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie charger.c core_charger_read_status charger_usb_sysfs_online_path");
 		gChargerStatus.connected |= NYX_CHARGER_PC_CONNECTED;
 		gChargerStatus.powered |= NYX_CHARGER_USB_POWERED;
+        nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie charger.c core_charger_read_status charger_usb_sysfs_online_path gChargerStatus.connected");
+        nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie charger.c core_charger_read_status charger_usb_sysfs_online_path gChargerStatus.powered");
 	}
 	else if (nyx_utils_read_value(charger_ac_sysfs_online_path) == 1)
 	{
+        nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie charger.c core_charger_read_status charger_ac_sysfs_online_path");
 		gChargerStatus.connected |= NYX_CHARGER_WALL_CONNECTED;
 		gChargerStatus.powered |= NYX_CHARGER_DIRECT_POWERED;
+        nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie charger.c core_charger_read_status charger_ac_sysfs_online_path gChargerStatus.connected");
+        nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie charger.c core_charger_read_status charger_ac_sysfs_online_path gChargerStatus.powered");
+
 	}
 
 	if ((nyx_utils_read_value(charger_usb_sysfs_online_path) == 1) ||
@@ -89,6 +97,7 @@ nyx_error_t core_charger_read_status(nyx_charger_status_t *status)
 	        (nyx_utils_read_value(charger_touch_sysfs_online_path) == 1) ||
 	        (nyx_utils_read_value(charger_wireless_sysfs_online_path) == 1))
 	{
+        nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie charger.c core_charger_read_status nyx_utils_read_value any of them is 1 returning charging = true");
 		gChargerStatus.is_charging = true;
 	}
 
@@ -120,8 +129,12 @@ void _battery_read_status()
 
 bool _has_charger_state_changed(char *old_state, char *new_state)
 {
+    nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie charger.c _has_charger_state_changed");
+    nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie charger.c _has_charger_state_changed old_state = %c",old_state);
+    nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie charger.c _has_charger_state_changed new_state = %c",new_state);
 	if (new_state && !old_state && (strcmp(new_state, "Full") == 0))
 	{
+        //nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie charger.c current_event = %s", current_event);
 		current_event &= ~NYX_CHARGE_RESTART;
 		current_event |= NYX_CHARGE_COMPLETE;
 		return true;
@@ -153,6 +166,9 @@ bool _has_charger_state_changed(char *old_state, char *new_state)
 
 bool _has_battery_state_changed(int old_state, int new_state)
 {
+    nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie charger.c _has_battery_state_changed old_state = %d",old_state);
+    nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie charger.c _has_battery_state_changed new_state = %d",new_state);
+
 	if (old_state != new_state)
 	{
 		if (new_state)
@@ -174,6 +190,9 @@ bool _has_battery_state_changed(int old_state, int new_state)
 
 bool _has_charger_connected_state_changed(bool old_state, bool new_state)
 {
+    nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie charger.c _has_charger_connected_state_changed old_state = %d",old_state);
+    nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie charger.c _has_charger_connected_state_changed new_state = %d",new_state);
+
 	if (old_state != new_state)
 	{
 		if (new_state)
@@ -278,34 +297,46 @@ void _detect_charger_sysfs_paths()
 	char *charger_touch_sysfs_path = find_power_supply_sysfs_path("Touch");
 	char *charger_wireless_sysfs_path = find_power_supply_sysfs_path("Wireless");
 
+nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie charger.c _detect_charger_sysfs_paths battery_sysfs_path = %s", battery_sysfs_path);
+nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie charger.c _detect_charger_sysfs_paths charger_usb_sysfs_path = %s", charger_usb_sysfs_path);
+nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie charger.c _detect_charger_sysfs_paths charger_ac_sysfs_path = %s", charger_ac_sysfs_path);
+nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie charger.c _detect_charger_sysfs_paths charger_touch_sysfs_path = %s", charger_touch_sysfs_path);
+nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie charger.c _detect_charger_sysfs_paths charger_wireless_sysfs_path = %s", charger_wireless_sysfs_path);
+
 	if (charger_usb_sysfs_path)
 	{
 		snprintf(charger_usb_sysfs_online_path, PATH_LEN, "%s/online",
 		         charger_usb_sysfs_path);
+                 nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie charger.c _detect_charger_sysfs_paths charger_usb_sysfs_online_path = %s", charger_usb_sysfs_online_path);
 	}
 
 	if (charger_ac_sysfs_path)
 	{
 		snprintf(charger_ac_sysfs_online_path, PATH_LEN, "%s/online",
 		         charger_ac_sysfs_path);
+                 nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie charger.c _detect_charger_sysfs_paths charger_ac_sysfs_online_path = %s", charger_ac_sysfs_online_path);
 	}
 
 	if (charger_touch_sysfs_path)
 	{
 		snprintf(charger_touch_sysfs_online_path, PATH_LEN, "%s/online",
 		         charger_touch_sysfs_path);
+                 nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie charger.c _detect_charger_sysfs_paths charger_touch_sysfs_online_path = %s", charger_touch_sysfs_online_path);
 	}
 
 	if (charger_wireless_sysfs_path)
 	{
 		snprintf(charger_wireless_sysfs_online_path, PATH_LEN, "%s/online",
 		         charger_wireless_sysfs_path);
+                 nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie charger.c _detect_charger_sysfs_paths charger_wireless_sysfs_online_path = %s", charger_wireless_sysfs_online_path);
 	}
 
 	if (battery_sysfs_path)
 	{
 		snprintf(batt_present_path, PATH_LEN, "%s/present", battery_sysfs_path);
 		snprintf(batt_status_path, PATH_LEN, "%s/status", battery_sysfs_path);
+        nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie charger.c _detect_charger_sysfs_paths batt_present_path = %s", batt_present_path);
+        nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie charger.c _detect_charger_sysfs_paths batt_status_path = %s", batt_status_path);
 	}
 }
 

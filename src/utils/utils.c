@@ -110,6 +110,9 @@ char *find_power_supply_sysfs_path(const char *device_type)
 
 	dir = g_dir_open(base_dir, 0, &gerror);
 
+    nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie utils.c dir = **%s**", dir);
+    nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie utils.c device_type = **%s**", device_type);
+
 	if (gerror)
 	{
 		nyx_error(MSGID_NYX_MOD_SYSFS_ERR, 0, "error: %s", gerror->message);
@@ -119,6 +122,7 @@ char *find_power_supply_sysfs_path(const char *device_type)
 
 	while ((sub_dir_name = g_dir_read_name(dir)) != 0)
 	{
+        nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie utils.c inside while sub_dir_name = **%c** ", sub_dir_name);
 		// ignore hidden files
 		if ('.' == sub_dir_name[0])
 		{
@@ -126,9 +130,11 @@ char *find_power_supply_sysfs_path(const char *device_type)
 		}
 
 		dir_path = g_build_filename(base_dir, sub_dir_name, NULL);
+        nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie utils.c dir_path = **%s**", dir_path);
 
 		if (g_file_test(dir_path, G_FILE_TEST_IS_DIR))
 		{
+            nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie utils.c inside if dir_path");
 			subdir = g_dir_open(dir_path, 0, &gerror);
 
 			if (gerror)
@@ -140,13 +146,20 @@ char *find_power_supply_sysfs_path(const char *device_type)
 
 			while ((file_name = g_dir_read_name(subdir)) != 0)
 			{
+                //nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie utils.c inside while file_name = **%s** ", file_name);
 				if (strcmp(file_name, "type") == 0)
 				{
+                    //nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie utils.c inside while file_name filename = type");
 					full_path = g_build_filename(dir_path, file_name, NULL);
+                    //nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie utils.c inside while full_path = %s", full_path);
 					FileGetString(full_path, file_contents, 64);
+
+                    //nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie utils.c inside while file_contents = **%s**", file_contents);
 
 					if (strcmp(file_contents, device_type) == 0)
 					{
+                        nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie utils.c file_contents and device_type are equal");
+                        //nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie utils.c file_contents and device_type are equal dir_path = %s", dir_path);
 						return dir_path;
 					}
 
