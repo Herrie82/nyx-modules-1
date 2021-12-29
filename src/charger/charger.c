@@ -52,6 +52,7 @@ char *battery_status = NULL;
 
 char batt_present_path[PATH_LEN] = {0,};
 char batt_status_path[PATH_LEN] = {0,};
+char charger_ac_status_path[PATH_LEN] = {0,};
 char charger_usb_sysfs_online_path[PATH_LEN] = {0,};
 char charger_ac_sysfs_online_path[PATH_LEN] = {0,};
 char charger_touch_sysfs_online_path[PATH_LEN] = {0,};
@@ -93,13 +94,21 @@ nyx_error_t core_charger_read_status(nyx_charger_status_t *status)
 	}
 
 	if ((nyx_utils_read_value(charger_usb_sysfs_online_path) == 1) ||
-	        (nyx_utils_read_value(charger_ac_sysfs_online_path) == 1) ||
+	        ((nyx_utils_read_value(charger_ac_sysfs_online_path) == 1) && (nyx_utils_read_value(charger_ac_status_path) == "Charging")) ||
 	        (nyx_utils_read_value(charger_touch_sysfs_online_path) == 1) ||
 	        (nyx_utils_read_value(charger_wireless_sysfs_online_path) == 1))
 	{
         nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie charger.c core_charger_read_status nyx_utils_read_value any of them is 1 returning charging = true");
 		gChargerStatus.is_charging = true;
 	}
+    
+   	if ((nyx_utils_read_value(charger_ac_sysfs_online_path) == 1) &&
+	        (nyx_utils_read_value(charger_ac_status_path) == "Not charging"))
+	{
+        nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie charger.c core_charger_read_status online and not charging");
+		gChargerStatus.is_charging = false;
+	}
+
 
 	if (status)
 	{
@@ -314,7 +323,8 @@ nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie charger.c _detect_charger_sys
 	{
 		snprintf(charger_ac_sysfs_online_path, PATH_LEN, "%s/online",
 		         charger_ac_sysfs_path);
-                 nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie charger.c _detect_charger_sysfs_paths charger_ac_sysfs_online_path = %s", charger_ac_sysfs_online_path);
+		snprintf(charger_ac_status_path, PATH_LEN, "%s/status", charger_ac_sysfs_path);                 
+                 nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie charger.c _detect_charger_sysfs_paths charger_ac_status_path = %s", charger_ac_status_path);
 	}
 
 	if (charger_touch_sysfs_path)
