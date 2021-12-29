@@ -49,6 +49,7 @@ extern nyx_device_callback_function_t state_change_callback;
 
 nyx_battery_status_t *curr_battery_state = NULL;
 char *battery_status = NULL;
+char *charger_ac_status = NULL;
 
 char batt_present_path[PATH_LEN] = {0,};
 char batt_status_path[PATH_LEN] = {0,};
@@ -94,7 +95,7 @@ nyx_error_t core_charger_read_status(nyx_charger_status_t *status)
 	}
 
 	if ((nyx_utils_read_value(charger_usb_sysfs_online_path) == 1) ||
-	        ((nyx_utils_read_value(charger_ac_sysfs_online_path) == 1) && (nyx_utils_read_value(charger_ac_status_path) == "Charging")) ||
+	        ((nyx_utils_read_value(charger_ac_sysfs_online_path) == 1) && (strcmp(charger_ac_status, "Charging") == 0)) ||
 	        (nyx_utils_read_value(charger_touch_sysfs_online_path) == 1) ||
 	        (nyx_utils_read_value(charger_wireless_sysfs_online_path) == 1))
 	{
@@ -103,7 +104,7 @@ nyx_error_t core_charger_read_status(nyx_charger_status_t *status)
 	}
     
    	if ((nyx_utils_read_value(charger_ac_sysfs_online_path) == 1) &&
-	        (nyx_utils_read_value(charger_ac_status_path) == "Not charging"))
+	        (strcmp(charger_ac_status, "Not charging") == 0))
 	{
         nyx_warn(MSGID_NYX_MOD_TP_INVALID_EVENT, 0,"Herrie charger.c core_charger_read_status online and not charging");
 		gChargerStatus.is_charging = false;
@@ -124,6 +125,7 @@ void _battery_read_status()
 	{
 		memset(curr_battery_state, 0, sizeof(nyx_battery_status_t));
 		memset(battery_status, 0, sizeof(battery_status));
+        memset(charger_ac_status, 0, sizeof(charger_ac_status));
 		char status[STATUS_LEN];
 
 		curr_battery_state->present = ((nyx_utils_read_value(batt_present_path)) == 1) ?
@@ -133,6 +135,12 @@ void _battery_read_status()
 		{
 			strcpy(battery_status, status);
 		}
+        
+   		if (FileGetString(charger_ac_status_path, status, STATUS_LEN) != -1)
+		{
+			strcpy(charger_ac_status, status);
+		}
+
 	}
 }
 
@@ -371,6 +379,13 @@ static void _charger_cleanup(void)
 		free(battery_status);
 		battery_status = NULL;
 	}
+    
+	if (NULL != charger_ac_status)
+	{
+		free(charger_ac_status);
+		charger_ac_status = NULL;
+	}
+
 
 	if (NULL != mon)
 	{
